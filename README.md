@@ -22,13 +22,19 @@ These scripts were written in R version 4.0.2 and RStudio Version 1.1.383.
 
 ## Authors
 
-•	Roberto Fernandez-Crespo, Institute of Global Health Innovation
-•	Sara Sekelj, Imperial College Health Partners
-•	Sarah Houston, Imperial College Health Partners
-•	Tomasz Szymanski, Imperial College Health Partners
-•	Anna Lawrence-Jones, Institute of Global Health Innovation
-•	Matthew Chisambi, Imperial College Health Partners
-•	Melanie Leis, Institute of Global Health Innovation
+-	Roberto Fernandez-Crespo, Institute of Global Health Innovation 
+
+-	Sara Sekelj, Imperial College Health Partners
+
+-	Sarah Houston, Imperial College Health Partners
+
+-	Tomasz Szymanski, Imperial College Health Partners
+
+-	Anna Lawrence-Jones, Institute of Global Health Innovation
+
+-	Matthew Chisambi, Imperial College Health Partners
+
+-	Melanie Leis, Institute of Global Health Innovation
 
 The team would also like to thank Dr Samantha Scholtz for her clinical insights on this analysis
 
