@@ -1,0 +1,578 @@
+---
+title: "North West London NDL Satellite Analysis"
+authors: 
+#- Roberto Fernandez-Crespo, Institute of Global Health Innovation
+#- Sara Sekelj, Imperial College Health Partners
+#- Sarah Houston, Imperial College Health Partners
+#- Tomasz Szymanski, Imperial College Health Partners
+#- Anna Lawrence-Jones, Institute of Global Health Innovation
+#- Matthew Chisambi, Imperial College Health Partners
+#- Melanie Leis, Institute of Global Health Innovation
+#- The team would also like to thank Dr Samantha Scholtz for her clinical insights on this analysis
+date: "26/04/2021"
+mainfont: Helvetica
+header-includes:
+  - \usepackage{helvet}
+  - \usepackage[T1]{fontenc}
+  - \renewcommand\familydefault{\sfdefault} 
+  - \usepackage[labelformat=empty]{caption}
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+## Background
+
+The satellite analysis explores the mental health needs of all shielded patients in North West London (NWL) before, during and after a period of shielding in 2020. The satellite analysis is built on the central analysis (1) with a special focus on mental health, and follows the same shielded patients definition period as the central analysis (detailed in Methods). Additionally, we explore the coding for suicide risk before and after the shielding period for the shielded patients' cohort.
+
+## Methods
+
+In this study we use the longitudinal Discover dataset. This dataset provides linked coded primary care, acute, mental health, community health and social care record for over 2.5 million patients who live and are registered with a GP in NWL. This dataset extracts data from over 400 provider organisations including 360 GP practices, 2 mental health, 2 community trusts and all acute providers attended by NWL patients (in the form of Secondary Uses Service (SUS) data) and high cost drug prescriptions. We utilise the shielded patients list from the central analysis, along with primary care data on diagnosis, through Read Codes and Long-Term Conditions (LTC) table in the dataset and secondary care data on admissions. 
+
+A long-term condition (LTC) is a condition that cannot, at present, be cured but is controlled by medication or other treatment. The LTC dataset in Discover indicates when an individual is diagnosed with an LTC, based on the presence of Read codes specific to that condition. This data table currently covers 41 conditions, including anxiety, depression and serious mental illness.
+
+### Cohort
+
+The shielding cohort was defined as any patient who was on the SPL at any point in the period prior to 31 July 2020. As the shielding list was updated every Monday, the date was adjusted to follow the timelines for the First Central Analysis.
+
+### Time Period
+
+2 years prior to shielding (01/03/2018-29/02/2020), during shielding (01/03/2020- 31/07/2020), and after shielding up to the reintroduction of shielding in 2021 (01/08/2020-31/12/2020).
+
+## Results
+
+### Demographics
+
+The total number of patients on the shielded list in NWL was 99,569 as of 3rd March 2021. 51% of the patients are female, and 49% are male (50,947 patients and 48,622 patients, respectively). The split of patients by age groups can be seen in Figure 1. All patients on the list had age and gender recorded.
+
+\vspace{7pt}
+
+```{r age, echo=FALSE,  message=FALSE, warning=FALSE,fig.width=7,fig.height=3,}
+#setwd("~/Rmd NDL")
+library(readxl)
+library(ggplot2)
+NDL_Satellite_Age <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "Age")
+NDL_Satellite_Age$AgeGroup <- factor(x = NDL_Satellite_Age$AgeGroup,
+                                     levels = c("<20", "20-29", "30-39", "40-49", "50-59", "60-69", "70-79", ">80"))
+
+ggplot(NDL_Satellite_Age, aes(x = AgeGroup, y = Count)) + 
+  geom_col() + 
+  labs(x='Age group', y = 'Number of patients') +
+  ggtitle("Figure 1: Distribution of age categories in shielding population") + theme_bw()
+```
+
+\vspace{7pt}
+
+The total number of patients is lower than had been reported in Output 1 (n = 112,134), due to two main factors: changes in source data and data selection. The cohort used in the Satellite analysis is a subset of the cohort used in Output 1, excluding those subjects who did not have available data due to refreshes of source data resulting in loss of data and excluding subjects who had incomplete data and would therefore not be suitable for the current analysis.
+
+A total of 6,684 patients (6.7%) did not have an Index of Multiple Deprivation (IMD) Rank recorded. The split between IMD deciles for the remaining patients can be seen in Figure 2.
+
+\vspace{7pt}
+
+```{r IMD, echo=FALSE, message=FALSE, warning=FALSE,fig.width=7,fig.height=3}
+setwd("~/Rmd NDL")
+library(dplyr)
+NDL_Satellite_IMD <- read_excel("./NDL_Satellite_AggData_0804.xlsx", sheet = "IMDDecile")
+
+NDL_Satellite_IMD2 <- NDL_Satellite_IMD %>% filter(IMD_Decile %in% c("1","2","3","4","5","6","7","8","9","10"))
+NDL_Satellite_IMD2$IMD_Decile <- factor(NDL_Satellite_IMD2$IMD_Decile,levels = c("1","2","3","4","5","6","7","8","9","10"))
+
+ggplot(NDL_Satellite_IMD2, aes(x = IMD_Decile, y = Count)) + 
+  geom_col() + 
+  ggtitle("Figure 2: Distribution of IMD Deciles in shielding population") +
+  labs(x='IMD decile',y='Number of patients') + theme_bw()
+```
+
+\vspace{7pt}
+
+When divided by electronic frailty index (eFI) categories, 34% of the cohort were classified as 'Fit' (33,632 patients, Figure 3). A total of 4,004 patients (4,004/99,569 patients, 4%) did not have the eFI category recorded.
+
+\vspace{7pt}
+
+```{r EFI, echo=FALSE,fig.width=7,fig.height=3}
+setwd("~/Rmd NDL")
+NDL_Satellite_EFI <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "eFI")
+
+NDL_Satellite_EFI2 <- NDL_Satellite_EFI %>% filter(eFI %in% c("Fit","Mild","Moderate","Severe"))
+
+ggplot(NDL_Satellite_EFI2, aes(x = eFI, y = Count)) + 
+  geom_col() + 
+  ggtitle("Figure 3: Distribution of eFI categories in shielding population") + 
+  labs(y = "Number of patients") + theme_bw()
+
+```
+
+\vspace{7pt}
+
+13% of the shielded cohort (13,005/99,569 patients) did not have ethnicity recorded. Of the remaining patients, the two largest groups were White (47%, 41,090 patients) and Asian or Asian British (32%, 27,589 patients) (Figure 4).
+
+\vspace{7pt}
+
+```{r Ethnicity, echo=FALSE,fig.width=7,fig.height=3}
+#setwd("~/Rmd NDL")
+NDL_Satellite_Ethnicity <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "Ethnicity")
+
+NDL_Satellite_Ethnicity2 <- NDL_Satellite_Ethnicity %>% filter(Ethnicity %in% c("White","Black or black british","Asian or asian british","Other ethnic groups","Mixed"))
+
+NDL_Satellite_Ethnicity2$Ethnicity <- factor(NDL_Satellite_Ethnicity2$Ethnicity,levels = NDL_Satellite_Ethnicity2$Ethnicity)
+
+ggplot(NDL_Satellite_Ethnicity2, aes(x = Ethnicity, y = Count)) + 
+  geom_col() + ggtitle("Figure 4: Distribution of ethnicity categories in shielding population") +
+  labs(y = 'Number of patients') + theme_bw()
+
+```
+
+\vspace{7pt}
+
+### Employment Status
+
+Employment status was identified by a clinical expert as an important variable to understand the context of shielded patients' mental health. We performed a feasibility analysis aiming to explore how well the employment status is coded among the shielded cohort. The codes covered both employed and unemployed status, two years before shielding, during shielding and after shielding up to 31 December 2020.
+
+Over the whole time period, a total of 5,172 patients had employment status recorded (5,172/99,569 patients, 5.2%) (Table 1). With only 5.2% of the shielded cohort having employment status recorded, we have excluded this from all further analysis.
+
+\vspace{7pt}
+
+```{r Employment, echo=FALSE,warning=FALSE,message=FALSE}
+#setwd("~/Rmd NDL")
+library(knitr)
+library(kableExtra)
+library(tinytex)
+NDL_Satellite_Employment <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "Employ Keyword")
+knitr::kable(NDL_Satellite_Employment,format = 'latex',
+             caption = "Table 1: Employment data") %>%
+  row_spec(0,bold=TRUE)
+```
+
+\vspace{7pt}
+
+### Suicide Risk Assessment
+
+The suicide risk assessments were explored in primary and secondary care. In primary care records, Read Codes were used to identify suicide risk assessments and in secondary care, ICD-10 codes X60-X84 were used to identify intentional self-harm.
+
+In primary care, we explored the suicide risk before, during and after shielding (Table 2).
+
+\vspace{7pt}
+
+```{r SRA, echo=FALSE, warning=FALSE,message=F}
+#setwd("~/Rmd NDL")
+library(knitr)
+library(kableExtra)
+library(tinytex)
+options(knitr.kable.NA = '')
+
+
+NDL_Satellite_SuicideRisk <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+    sheet = "Suicide Risk Codes", range = "B1:E7")
+colnames(NDL_Satellite_SuicideRisk) <- c("Time period","Coding","Total number of patients","Average number of patients per month")
+
+
+kable(x = NDL_Satellite_SuicideRisk,format = 'latex',
+      caption = "Table 2: Recording of suicide risk codes") %>%
+  column_spec(1,width = '3cm') %>%
+  column_spec(4,width = '5cm') %>%
+  column_spec(3,width = '3cm') %>%
+  column_spec(2,width = '4cm') %>%
+  collapse_rows(columns = 1,valign = 'top') %>%
+  kable_styling(latex_options = "scale_down") %>%
+  kable_styling(latex_options = "hold_position") %>%
+  row_spec(0,bold=TRUE)  
+ 
+
+```
+
+\vspace{7pt}
+
+**Key finding and interpretation**: The monthly frequency of recording of suicide risk codes increased during the shielding period compared to the monthly rate before the shielding period (average of 60 monthly recordings before and 104 during shielding), and more than doubled following the shielding period (134 after shielding). This analysis should be interpreted with caution. It was performed as a feasibility piece of work to understand clinical coding of suicide risk. Further research is needed to understand the impact of shielding on suicide risk. Data are shown in Table 2.
+
+The recording of suicide risk codes were also compared at a patient level before, during and after shielding to understand if shielding patients who previously had no prior record of suicide risk codes during the baseline period were recorded as being evaluated for suicide risk following the introduction of shielding.
+
+Suicide risk assessment codes were also analysed at the patient level in the shielded cohort to determine if there had been new incidences of any suicide risk code during or after the shielding period compared to the baseline time period before shielding.
+
+**Key finding and interpretation**: 755 patients who were shielding (0.76%) had a new recording of a suicide risk code following the introduction of shielding, compared to 323 patients who had evidence of risk before shielding started (0.32%). The majority of shielding patients (98.92%) had no evidence of suicide risk assessment before, during or after shielding.
+
+The coding for suicide risk assessments in the shielded population is sparse. Although there does not appear to be a large increase in suicide risk assessments after the introduction of shielding, this analysis would benefit from comparison to a matched cohort group to elucidate the exact difference in number of suicide risk assessments in the population.
+
+Read codes referring to "No suicidal thoughts" were also counted in the shielded population before, during and after shielding to estimate the number of patients who had undergone a suicide risk assessment where the outcome was "No suicidal thoughts" (Table 3).
+
+\vspace{7pt}
+
+```{r NSR, echo=FALSE}
+#setwd("~/Rmd NDL")
+NDL_Satellite_NoSuicideRisk <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "1BS4.")
+
+colnames(NDL_Satellite_NoSuicideRisk) <- c("Time period","Coding","Number of patients","Average number of patients per month")
+knitr::kable(list(NDL_Satellite_NoSuicideRisk),format = 'latex',
+             caption = "Table 3: Recording of 'no suicide risk' code") %>%
+  column_spec(1,width = '3cm') %>%
+  column_spec(4,width = '5cm') %>%
+  column_spec(3,width = '3cm') %>%
+  column_spec(2,width = '5cm') %>%
+  collapse_rows(columns = 1,valign = 'top') %>%
+  kable_styling(latex_options = "scale_down") %>%
+  kable_styling(latex_options = "hold_position") %>%
+  row_spec(0,bold=TRUE) 
+
+```
+
+\vspace{7pt}
+
+**Key finding and interpretation**: The monthly frequency of this recording, and therefore incidences of suicide assessment, increased during the shielding period compared to the monthly rate before the shielding period, and further increased following the shielding period. Data are shown in Table 3.
+
+Similar to suicide risk assessments, the coding for 'No suicidal thoughts' in the shielded population is sparse. Although there does not appear to be a large increase in suicide risk assessments with a positive outcome after the introduction of shielding, this analysis would benefit from comparison to a matched cohort group to elucidate the exact difference in number of suicide risk assessments in the population. Considering the similarity of findings of increase in suicide risk assessments during and after the shielding period, whether with a positive or negative outcome, we can hypothesize that suicide risk assessments as a whole may have increased during and after shielding in the shielding population, although the number of patients who have a new incidence of suicide risk assessment is still small (0.76%).
+
+### Intentional Self Harm
+
+By linking secondary care records for our cohort, we explored all admissions where the 'intentional self-harm' codes appeared in any diagnostic position, before, during and after shielding (Table 4).
+
+\vspace{7pt}
+
+```{r ISH, echo=FALSE}
+#setwd("~/Rmd NDL")
+NDL_Satellite_IntentionalSH <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "Intentional self harm")
+
+colnames(NDL_Satellite_IntentionalSH) <- c("Time period","Admission","Number of patients","Number of patients standardised by month")
+knitr::kable(list(NDL_Satellite_IntentionalSH),format = 'latex',
+             caption = "Table 4: Recording of intentional self harm codes"
+)%>%
+  column_spec(1,width = '5cm') %>%
+  column_spec(2,width = '5cm') %>%
+  column_spec(3,width = '3cm') %>%
+  column_spec(4,width = '3cm') %>%
+  collapse_rows(columns = 1,valign = 'top') %>%
+  kable_styling(latex_options = "scale_down") %>%
+  kable_styling(latex_options = "hold_position") %>%
+  row_spec(0,bold=TRUE) 
+ 
+```
+
+\vspace{7pt}
+
+**Key findings and interpretation:** The number of shielded patients with a recording of intentional self-harm during any of the shielding time periods is very low (0.24%). As it has not been compared to a control cohort we cannot report on its relative frequency in the population. Both the total number of patients and the monthly frequency of patients with recording of admission for intentional self-harm decreased during and after the shielding period. Although this data provides insight into intentional self-harm admissions, it only covers patients admitted to hospital and therefore does not cover every case of intentional self-harm. Full analysis of linked ONS data would provide more insight into intentional self-harm before, during and after shielding.
+
+Admissions for intentional self-harm appear to have decreased during and after the shielding periods, however the sample size of patients being admitted to hospital with this code is very small (n = 247) and we have not compared these findings with a matched control cohort, therefore this finding should be considered with caution.
+
+### Mental Health Diagnosis as a Long Term Condition
+
+We utilized the Long-Term Conditions (LTC) table in Discover dataset, which identifies a total of 41 LTCs. Among these, we focused on depression, anxiety and mental health (serious mental illness). The results focus on total population with either condition and the relevant odds ratios. Where the risk factor has more than two levels, one level is selected as a standard reference group (the lowest exposure risk) to which other groups are compared. A Chi-squared test for association was conducted. P values of \<0.05 were considered statistically significant and were corrected for multiple testing using the false discovery rate method.
+
+It is important to note that Long-Term Conditions are attributed to a patient in Discover following the first incidence of a specified code related to that condition while the patient is in the system, and do not take into account previous history of these conditions from healthcare settings outside of North West London. For the calculation of Odds Ratios, shielding patients \<30 years of age were grouped together as the recording of Long-Term Conditions increases with age.
+
+```{r odds, echo=FALSE, message=FALSE, warning=FALSE}
+#setwd("~/Rmd NDL")
+
+#Libraries
+library(tidyverse)
+library(epitools)
+library(cowplot)
+
+#Functions
+getOddsRatio <- function(data,var,order){
+  dt <- subset(data,data$Variable == var)
+  dt$`Variable-Value` <- factor(dt$`Variable-Value`,levels = order)
+  dt <- dt %>%
+    select(var=`Variable-Value`,conN = `Number with condition`,NoconN = `Number without condition`) %>%
+    pivot_longer(cols=c("conN","NoconN"),names_to = "case",values_to = "counts") %>%
+    xtabs(formula = counts~var+case,data = .)
+  odds <- oddsratio(dt,rev = 'columns')
+  rws <- rownames(odds$measure)
+  oddst <- cbind.data.frame(odds$measure,odds$p.value)
+  oddst$Variable = var
+  oddst$Category = rws
+  return(oddst)
+}
+preparePlotData <- function(data,Method='fdr'){
+  data$padj <- p.adjust(data$fisher.exact,method = Method)
+  data$signif <- ifelse(data$padj<0.05,"Significant","Not significant")
+  data <- subset(data,!is.na(data$padj))
+  data$Category[data$Category=="UNKNOWN"] <- "Unknown"
+  data$Variable <- factor(data$Variable,levels = c("Gender","Age","IMD Decile","Ethnicity","eFI","BMI"),
+                          labels = c("Gender\n(ref. group = Male)",
+                                     "Age\n(ref. group = 18-29)",
+                                     "IMD Decile\n(ref. group = 10\n(least deprived))",
+                                     "Ethnicity\n(ref. group = Asian or\nasian british)",
+                                     "eFI\n(ref. group = Fit)",
+                                     "BMI\n(ref. group = Healthy"))
+  data$Category <- factor(data$Category,levels = c("Female",
+                                                   "9","8","7","6", "5","4","3","2","1",                  
+                                                   "White","Black or black british","Mixed","Other ethnic groups","Unknown",
+                                                   "Mild","Moderate","Severe",
+                                                   "Underweight","Overweight","Obese",
+                                                   "30-39","40-49","50-59","60-69", "70-79",">=80")
+                          )
+  data$Pstars <- gtools:::stars.pval(data$padj)
+  data$Pstars <- ifelse(data$Pstars==" "," NS",data$Pstars)
+  data$Plot_lab <- paste0(
+    round(data$estimate,2),
+    " (", round(data$lower,2),"-",round(data$upper,2),");",
+    data$Pstars
+  )
+  data$Plot_lab_pos <- max(data$upper) + 1.5
+  return(data)
+}
+
+#Data
+odds_all <- read_xlsx("./NDL Satellite OR Data 250321.xlsx",sheet = "Anxiety OR Depr OR MH")
+odds_anx <- read_xlsx("./NDL Satellite OR Data 250321.xlsx",sheet = "Anxiety")
+odds_dep <- read_xlsx("./NDL Satellite OR Data 250321.xlsx",sheet = "Depression")
+odds_MH <- read_xlsx("./NDL Satellite OR Data 250321.xlsx",sheet = "MH")
+
+odds_all <- odds_all[,1:6]
+odds_anx <- odds_anx[,1:6]
+odds_dep <- odds_dep[,1:6]
+odds_MH <- odds_MH[,1:6]
+
+#Overall####
+odds_all_gender <- getOddsRatio(odds_all,"Gender",c("Male","Female"))
+odds_all_IMD <- getOddsRatio(odds_all,"IMD Decile",c("10","9","8","7","6","5","4","3","2","1"))
+odds_all_Ethinicity <- getOddsRatio(odds_all,"Ethnicity",c("Asian or asian british",
+                                                       "Black or black british",
+                                                       "Mixed",
+                                                       "Other ethnic groups",
+                                                       "UNKNOWN",
+                                                       "White"))
+odds_all_eFI <- getOddsRatio(odds_all,"eFI",c("Fit","Mild","Moderate","Severe"))
+odds_all_BMI <- getOddsRatio(odds_all,"BMI",c("Healthy","Underweight","Overweight","Obese"))
+odds_all_Age <- getOddsRatio(odds_all,"Age",c("<30","30-39","40-49","50-59","60-69","70-79",">=80"))
+
+oddstab_all <- rbind.data.frame(odds_all_gender,odds_all_IMD,odds_all_Ethinicity,
+                                odds_all_eFI,odds_all_BMI,odds_all_Age)
+rm(odds_all_gender,odds_all_IMD,odds_all_Ethinicity,
+   odds_all_eFI,odds_all_BMI,odds_all_Age)
+
+#Anxiety####
+odds_anx_gender <- getOddsRatio(odds_anx,"Gender",c("Male","Female"))
+odds_anx_IMD <- getOddsRatio(odds_anx,"IMD Decile",c("10","9","8","7","6","5","4","3","2","1"))
+odds_anx_Ethinicity <- getOddsRatio(odds_anx,"Ethnicity",c("Asian or asian british",
+                                                           "Black or black british",
+                                                           "Mixed",
+                                                           "Other ethnic groups",
+                                                           "UNKNOWN",
+                                                           "White"))
+odds_anx_eFI <- getOddsRatio(odds_anx,"eFI",c("Fit","Mild","Moderate","Severe"))
+odds_anx_BMI <- getOddsRatio(odds_anx,"BMI",c("Healthy","Underweight","Overweight","Obese"))
+odds_anx_Age <- getOddsRatio(odds_anx,"Age",c("<30","30-39","40-49","50-59","60-69","70-79",">=80"))
+
+oddstab_anx <- rbind.data.frame(odds_anx_gender,odds_anx_IMD,odds_anx_Ethinicity,
+                                odds_anx_eFI,odds_anx_BMI,odds_anx_Age)
+rm(odds_anx_gender,odds_anx_IMD,odds_anx_Ethinicity,
+   odds_anx_eFI,odds_anx_BMI,odds_anx_Age)
+
+#Depression####
+odds_dep_gender <- getOddsRatio(odds_dep,"Gender",c("Male","Female"))
+odds_dep_IMD <- getOddsRatio(odds_dep,"IMD Decile",c("10","9","8","7","6","5","4","3","2","1"))
+odds_dep_Ethinicity <- getOddsRatio(odds_dep,"Ethnicity",c("Asian or asian british",
+                                                           "Black or black british",
+                                                           "Mixed",
+                                                           "Other ethnic groups",
+                                                           "UNKNOWN",
+                                                           "White"))
+odds_dep_eFI <- getOddsRatio(odds_dep,"eFI",c("Fit","Mild","Moderate","Severe"))
+odds_dep_BMI <- getOddsRatio(odds_dep,"BMI",c("Healthy","Underweight","Overweight","Obese"))
+odds_dep_Age <- getOddsRatio(odds_dep,"Age",c("<30","30-39","40-49","50-59","60-69","70-79",">=80"))
+
+oddstab_dep <- rbind.data.frame(odds_dep_gender,odds_dep_IMD,odds_dep_Ethinicity,
+                                odds_dep_eFI,odds_dep_BMI,odds_dep_Age)
+rm(odds_dep_gender,odds_dep_IMD,odds_dep_Ethinicity,odds_dep_eFI,odds_dep_BMI,odds_dep_Age)
+
+
+
+
+#Mental health####
+odds_mh_gender <- getOddsRatio(odds_MH,"Gender",c("Male","Female"))
+odds_mh_IMD <- getOddsRatio(odds_MH,"IMD Decile",c("10","9","8","7","6","5","4","3","2","1"))
+odds_mh_Ethinicity <- getOddsRatio(odds_MH,"Ethnicity",c("Asian or asian british",
+                                                           "Black or black british",
+                                                           "Mixed",
+                                                           "Other ethnic groups",
+                                                           "UNKNOWN",
+                                                           "White"))
+odds_mh_eFI <- getOddsRatio(odds_MH,"eFI",c("Fit","Mild","Moderate","Severe"))
+odds_mh_BMI <- getOddsRatio(odds_MH,"BMI",c("Healthy","Underweight","Overweight","Obese"))
+odds_mh_Age <- getOddsRatio(odds_MH,"Age",c("<30","30-39","40-49","50-59","60-69","70-79",">=80"))
+
+oddstab_mh <- rbind.data.frame(odds_mh_gender,odds_mh_IMD,odds_mh_Ethinicity,
+                                odds_mh_eFI,odds_mh_BMI,odds_mh_Age)
+rm(odds_mh_gender,odds_mh_IMD,odds_mh_Ethinicity, odds_mh_eFI,odds_mh_BMI,odds_mh_Age)
+
+
+```
+
+\newpage
+**Key finding and interpretation**: Age appears to play a large role in the shielding population as to whether patients have a LTC of anxiety, depression or mental health (serious mental illness), with the 50-59 year age category being most affected (OR = 4.18). Deprivation (IMD Decile) also has a stepwise impact on the mental health of the shielding population, with those in the most deprived decile having 1.66 times greater odds of having a LTC related to mental health recorded than the odds of those in least deprived areas. Frailty also has a significant impact on mental health, with those in the severely frail category having 2.06 times greater odds of having a LTC related to mental health recorded than those in the fit category. BMI results are mixed, and it would be valuable to explore impact of BMI as a binary variable (Healthy/Not healthy), as opposed to four BMI categories. Data are included in Figure 5.
+
+\vspace{7pt}
+
+```{r ALL, echo=FALSE, fig.height=9, fig.width=9}
+#Plots - overall####
+oddstab_all_plot <- preparePlotData(oddstab_all)
+
+p <- ggplot(oddstab_all_plot) + 
+  geom_point(aes(x=Category,y=estimate,color=signif)) + 
+  geom_errorbar(aes(ymin=lower,ymax=upper,x=Category)) + 
+  facet_grid(Variable~.,scales = "free_y",switch = 'y') +
+  geom_text(aes(x=Category,y=Plot_lab_pos,label=Plot_lab),size=3,hjust="inward") +
+  theme_minimal() + 
+  theme(strip.placement = "outside",
+        legend.position = 'bottom') +
+  labs(y="Odds ratio",x="",color="") + 
+  coord_flip() +
+  scale_color_manual(breaks = c("Not significant","Significant"),values = c("Blue","Red"))
+  
+
+cowplot::plot_grid(
+  ggplot() + 
+    ggtitle(str_wrap("Figure 5: Forest plot describing odds ratios of mental health related Long-Term Conditions of Anxiety, Depression or Serious Mental Health issues in the shielded population by demographic category",90)) + 
+    theme_void(),
+    p,ncol = 1,rel_heights = c(1,10)
+)
+
+
+```
+
+\newpage
+
+**Key finding and interpretation**: Similarly to the overall mental health findings, the odds of shielding patients who were 50-59 years of age to have a recording of anxiety were 3 times greater than the odds of the reference category (\<30 years of age). In contrast, an IMD Decile of 5 was used in this case as the reference category and a smaller step-wise change in odds from most- to least deprived was calculated for patients with anxiety. The odds of white patients having a record of anxiety was 1.8 greater than the odds of Asian or Asian British patients. Frailty was also an important factor in the recording of anxiety, with the odds of severely frail patients suffering from anxiety being 1.9 times greater than that of fit patients. BMI results are mixed, and it would be valuable to explore impact of BMI as a binary variable (Healthy/Not healthy), as opposed to four BMI categories. Data are included in Figure 6.
+
+\vspace{7pt}
+
+```{r ANX, echo=FALSE,fig.height=9, fig.width=9}
+
+#Plots - anxiety####
+
+oddstab_anx_plot <- preparePlotData(oddstab_anx)
+
+p <- ggplot(oddstab_anx_plot) + 
+  geom_point(aes(x=Category,y=estimate,color=signif)) + 
+  geom_errorbar(aes(ymin=lower,ymax=upper,x=Category)) + 
+  facet_grid(Variable~.,scales = "free_y",switch = 'y') +
+  geom_text(aes(x=Category,y=Plot_lab_pos,label=Plot_lab),size=3,hjust="inward") +
+  theme_minimal() + 
+  theme(strip.placement = "outside",
+        legend.position = 'bottom') +
+  labs(y="Odds ratio",x="",color="") + 
+  coord_flip() +
+  scale_color_manual(breaks = c("Not significant","Significant"),values = c("Blue","Red")) 
+
+cowplot::plot_grid(
+  ggplot() + 
+    ggtitle(str_wrap("Figure 6: Forest plot describing odds ratios of Anxiety by demographic category in the shielded population",90)) + 
+    theme_void(),
+    p,ncol = 1,rel_heights = c(1,10)
+)
+
+```
+
+\newpage
+
+**Key finding and interpretation**: Similarly to the overall mental health findings, the odds of shielding patients who were 50-59 years of age to have a recording of depression were 5.5 times greater than the odds of the reference category (\<30 years of age). Additionally, a step-wise decrease in odds from most- to least deprived was calculated for patients with depression, where in the most deprived areas (IMD Decile = 1) the odds of suffering from depression was 1.8 times that in the least deprived areas (IMD Decile = 10). The odds of white patients having a record of depression was 1.69 greater than the odds of Asian or Asian British patients. Frailty was also an important factor in the recording of depression, with the odds of severely frail patients suffering from depression being two times greater than that of fit patients. Suprisingly, the odds of a diagnosis of depression was not altered by differences in BMI, with overweight patients having equal odds as patients with a healthy BMI, contradicting previous reports (2). BMI results are mixed, and it would be valuable to explore impact of BMI as a binary variable (Healthy/Not healthy), as opposed to four BMI categories. Data are included in Figure 7.
+
+\vspace{7pt}
+
+```{r DEP, echo=FALSE,fig.height=9, fig.width=9}
+
+#Plots - depression####
+
+oddstab_dep_plot <- preparePlotData(oddstab_dep)
+
+p <- ggplot(oddstab_dep_plot) + 
+  geom_point(aes(x=Category,y=estimate,color=signif)) + 
+  geom_errorbar(aes(ymin=lower,ymax=upper,x=Category)) + 
+  facet_grid(Variable~.,scales = "free_y",switch = 'y') +
+  geom_text(aes(x=Category,y=Plot_lab_pos,label=Plot_lab),size=3,hjust="inward") +
+  theme_minimal() + 
+  theme(strip.placement = "outside",
+        legend.position = 'bottom') +
+  labs(y="Odds ratio",x="",color="") + 
+  coord_flip() +
+  scale_color_manual(breaks = c("Not significant","Significant"),values = c("Blue","Red"))
+
+cowplot::plot_grid(
+  ggplot() + 
+    ggtitle(str_wrap("Figure 7: Forest plot describing odds ratios of Depression by demographic category in the shielded population",90)) + 
+    theme_void(),
+    p,ncol = 1,rel_heights = c(1,10)
+)
+
+```
+
+\newpage
+
+**Key finding and interpretation**: Mirroring our findings on all mental health LTCs, the odds of shielding patients who were 50- 59 years old having serious mental illness were significantly greater, 4.5 times that of patients \<30 years old. In terms of deprivation, there was a much steeper increase in the odds of developing serious mental illness in shielding patients from the most deprived group (OR = 3.9), compared to the least deprived group. In contrast to findings from anxiety and depression, the most affected ethnicity group for serious mental illness were the Black or Black British and mixed-race groups, whose odds were 1.64 times and 1.69 times greater than of Asian or Asian British patients. Data are included in Figure 8. It is important to note that the sample size of patients with a record of serious mental health issues was small (n = 3,202), therefore findings should be considered with caution as the resulting confidence intervals are wide.
+
+\vspace{7pt}
+
+```{r SMH, echo=FALSE,fig.height=9, fig.width=9}
+
+#Plots - mental health####
+
+oddstab_mh_plot <- preparePlotData(oddstab_mh)
+
+p <- ggplot(oddstab_mh_plot) + 
+  geom_point(aes(x=Category,y=estimate,color=signif)) + 
+  geom_errorbar(aes(ymin=lower,ymax=upper,x=Category)) + 
+  facet_grid(Variable~.,scales = "free_y",switch = 'y') +
+  geom_text(aes(x=Category,y=Plot_lab_pos,label=Plot_lab),size=3,hjust="inward") +
+  theme_minimal() + 
+  theme(strip.placement = "outside",
+        legend.position = 'bottom') +
+  labs(y="Odds ratio",x="",color="") + 
+  coord_flip() +
+  scale_color_manual(breaks = c("Not significant","Significant"),values = c("Blue","Red"))
+
+cowplot::plot_grid(
+  ggplot() + 
+    ggtitle(str_wrap("Figure 8: Forest plot describing odds ratios of serious mental illness by demographic category in the shielded population",90)) +
+    theme_void(),
+    p,ncol = 1,rel_heights = c(1,10)
+)
+
+```
+
+\vspace{7pt}
+
+### Change in LTC Status during Shielding
+
+Change in long-term condition status was also examined in the shielding cohort, comparing the period before and after the introduction of shielding (Table 5).
+
+\vspace{7pt}
+
+```{r LTCs, echo=FALSE}
+#setwd("~/Rmd NDL")
+NDL_Satellite_LTC <- read_excel("./NDL_Satellite_AggData_0804.xlsx", 
+                                         sheet = "LTC")
+knitr::kable(list(NDL_Satellite_LTC),format = 'latex',
+             caption = "Table 5: Change in LTC Status During Shielding")  %>% 
+  column_spec(1,width = '5cm') %>%
+  column_spec(2,width = '4cm') %>%
+  column_spec(3,width = '2cm') %>%
+  column_spec(4,width = '2cm') %>%
+  column_spec(4,width = '2cm') %>%
+  collapse_rows(columns = 1,valign = 'top') %>%
+  kable_styling(latex_options = "scale_down") %>%
+  kable_styling(latex_options = "hold_position") %>%
+  row_spec(0,bold=TRUE) 
+
+```
+
+\vspace{7pt}
+
+**Key finding and interpretation**: The numbers of shielding patients with a LTC of anxiety and depression prior to the introduction of shielding were relatively high, at 17.5% and 21.78% respectively. Records of long-term conditions related to mental health (serious mental illness) are low at 3.5%. Following the introduction of shielding, there was a \<1% increase in the number of shielding patients having anxiety, depression or mental health (serious mental illness) diagnosis.
+
+**Hypothesised interpretation:** Long-term conditions related to mental health appear to be relatively high in the shielding population, although this cannot be confirmed without comparison to a matched control cohort. The very small percentage increases in patients with a new recording of mental health related long-term conditions is reassuring, suggesting the introduction of shielding had limited impact on patients with no previous history of mental health issues.
+
+## Conclusions
+
+The NWL Satellite analysis provides further insight into patients on the shielding patients list. The focus on the analysis was on mental health diagnosis and intentional self-harm, along with a feasibility analysis covering employment status and suicide risk assessment clinical coding. Further research is necessary to quantify impact of shielding on patients' mental health and intentional self-harm frequency. The linked ONS data, which provides cause of death, would be a valuable asset in further research.
+
+### References
+
+1. The Health Foundation. Who was advised to shield from COVID-19? 2021. <https://www.health.org.uk/news-and-comment/charts-and-infographics/exploring-demographic-variation-in-groups-advised-to-shield>
+
+2. Luppino FS, de Wit LM, Bouvy PF, et al. Overweight, Obesity, and Depression: A Systematic Review and Meta-analysis of Longitudinal Studies. Arch Gen Psychiatry. 2010;67(3):220--229. <doi:10.1001/archgenpsychiatry.2010.2>
